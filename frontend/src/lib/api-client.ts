@@ -1,7 +1,16 @@
 import axios from 'axios';
 
+const getBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    // In browser: always use relative '/api/v1' to let Next.js proxy handle it seamlessly.
+    // This eliminates mixed-content HTTPS->HTTP blocks and localhost failures on mobile/remote devices.
+    return '/api/v1';
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+};
+
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
+  baseURL: getBaseUrl(),
   withCredentials: true, // Critical: sends HTTP-only cookies automatically
   headers: {
     'Content-Type': 'application/json',
