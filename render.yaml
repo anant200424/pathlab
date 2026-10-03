@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: labcare-pro-backend
+    runtime: node
+    plan: free
+    region: singapore # or oregon / frankfurt
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: API_PREFIX
+        value: /api/v1
+      - key: MONGODB_URI
+        sync: false # Set in Render Dashboard using your free MongoDB Atlas M0 URI
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: FRONTEND_ORIGINS
+        sync: false # Set to your deployed Vercel frontend URL (e.g. https://labcare.vercel.app)
+      - key: OBJECT_STORAGE_PROVIDER
+        value: local
+      - key: OBJECT_STORAGE_LOCAL_DIR
+        value: ./storage/uploads
+      - key: LOG_LEVEL
+        value: info
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: COOKIE_SAME_SITE
+        value: "none" # Required for cross-domain cookies between Render backend and Vercel frontend
