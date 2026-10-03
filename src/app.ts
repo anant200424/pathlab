@@ -53,6 +53,10 @@ export function createApp(): Express {
         if (
           !origin ||
           allowedOrigins.includes(origin) ||
+          allowedOrigins.includes("*") ||
+          origin.endsWith(".vercel.app") ||
+          origin.includes("vercel.app") ||
+          origin.includes("localhost") ||
           env.NODE_ENV === "development"
         ) {
           callback(null, true);
