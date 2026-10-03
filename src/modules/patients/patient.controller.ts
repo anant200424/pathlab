@@ -8,13 +8,33 @@ export class PatientController {
     next: NextFunction,
   ): Promise<void> {
     try {
+      const clinicId =
+        req.body.clinicId ||
+        req.clinicId ||
+        (req.user?.clinics && req.user.clinics[0]?.toString());
+      if (clinicId) {
+        req.body.clinicId = clinicId;
+      }
+
       const result = await PatientService.registerPatient(
         req.body,
         req.user?._id?.toString(),
       );
+
+      const patientDoc = result.patient;
+      const patientData =
+        typeof (patientDoc as any)?.toObject === "function"
+          ? (patientDoc as any).toObject()
+          : patientDoc;
+
       res.status(201).json({
         success: true,
-        data: result,
+        data: {
+          ...patientData,
+          patient: result.patient,
+          visit: result.visit,
+          warning: result.warning,
+        },
         message: "Patient registered successfully.",
       });
     } catch (error) {

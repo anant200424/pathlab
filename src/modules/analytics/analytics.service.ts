@@ -20,6 +20,8 @@ export class AnalyticsService {
     const [
       totalPatients,
       todayPatients,
+      totalOrders,
+      todayOrders,
       pendingSamples,
       awaitingVerificationOrders,
       publishedReports,
@@ -31,6 +33,11 @@ export class AnalyticsService {
       Patient.countDocuments({
         ...filter,
         isActive: true,
+        createdAt: { $gte: todayStart },
+      }),
+      TestOrder.countDocuments(filter),
+      TestOrder.countDocuments({
+        ...filter,
         createdAt: { $gte: todayStart },
       }),
       Sample.countDocuments({
@@ -71,11 +78,24 @@ export class AnalyticsService {
     );
 
     return {
+      // Flat KPIs for Dashboard UI
+      totalOrders,
+      todayOrders,
+      pendingResults: pendingSamples,
+      pendingVerification: awaitingVerificationOrders,
+      totalRevenue: Number(totalCollected.toFixed(2)),
+      todayRevenue: Number(todayCollections.toFixed(2)),
+      totalPatients,
+      todayPatients,
+
+      // Grouped breakdown
       patients: {
         total: totalPatients,
         registeredToday: todayPatients,
       },
       workload: {
+        totalOrders,
+        todayOrders,
         pendingSamples,
         awaitingVerificationOrders,
         publishedReports,

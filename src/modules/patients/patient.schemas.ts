@@ -1,7 +1,9 @@
 import { z } from "zod";
 
-export const createPatientSchema = z.object({
-  fullName: z.string().min(2, "Full name is required"),
+export const basePatientSchema = z.object({
+  fullName: z.string().optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
   dateOfBirth: z
     .string()
     .datetime()
@@ -13,9 +15,13 @@ export const createPatientSchema = z.object({
   gender: z.enum(["male", "female", "other"]),
   phone: z.string().min(7, "Phone number must be at least 7 digits"),
   email: z.string().email().optional().or(z.literal("")),
+  bloodGroup: z
+    .enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", ""])
+    .optional(),
   address: z
     .object({
       line1: z.string().default(""),
+      street: z.string().optional(),
       line2: z.string().optional(),
       city: z.string().default(""),
       state: z.string().default(""),
@@ -35,7 +41,7 @@ export const createPatientSchema = z.object({
       phone: z.string(),
     })
     .optional(),
-  clinicId: z.string().min(1, "clinicId is required"),
+  clinicId: z.string().optional(),
   defaultReferringDoctorId: z.string().optional(),
   createInitialVisit: z.boolean().default(true),
   visitType: z
@@ -44,6 +50,44 @@ export const createPatientSchema = z.object({
   visitNotes: z.string().optional(),
 });
 
-export const updatePatientSchema = createPatientSchema
-  .partial()
-  .omit({ clinicId: true });
+export const createPatientSchema = z.preprocess((val: any) => {
+  if (typeof val === "object" && val !== null) {
+    const raw = { ...val };
+    if (!raw.fullName && (raw.firstName || raw.lastName)) {
+      raw.fullName = `${raw.firstName || ""} ${raw.lastName || ""}`.trim();
+    }
+    if (raw.address && typeof raw.address === "object") {
+      raw.address = {
+        ...raw.address,
+        line1: raw.address.line1 || raw.address.street || "",
+      };
+    }
+    return raw;
+  }
+  return val;
+}, basePatientSchema.superRefine((data, ctx) => {
+  if (!data.fullName || data.fullName.trim().length < 2) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Full name is required and must be at least 2 characters",
+      path: ["fullName"],
+    });
+  }
+}));
+
+export const updatePatientSchema = z.preprocess((val: any) => {
+  if (typeof val === "object" && val !== null) {
+    const raw = { ...val };
+    if (!raw.fullName && (raw.firstName || raw.lastName)) {
+      raw.fullName = `${raw.firstName || ""} ${raw.lastName || ""}`.trim();
+    }
+    if (raw.address && typeof raw.address === "object") {
+      raw.address = {
+        ...raw.address,
+        line1: raw.address.line1 || raw.address.street || "",
+      };
+    }
+    return raw;
+  }
+  return val;
+}, basePatientSchema.partial().omit({ clinicId: true }));

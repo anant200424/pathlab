@@ -23,6 +23,7 @@ export interface IPatient extends Document {
     relationship: string;
     phone: string;
   };
+  bloodGroup?: string;
   clinicId: Types.ObjectId;
   defaultReferringDoctorId?: Types.ObjectId;
   consentAcknowledged: boolean;
@@ -30,6 +31,8 @@ export interface IPatient extends Document {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+  firstName?: string;
+  lastName?: string;
 }
 
 const patientSchema = new Schema<IPatient>(
@@ -85,6 +88,10 @@ const patientSchema = new Schema<IPatient>(
       lowercase: true,
       trim: true,
     },
+    bloodGroup: {
+      type: String,
+      trim: true,
+    },
     address: {
       line1: { type: String, default: "" },
       line2: { type: String },
@@ -124,8 +131,21 @@ const patientSchema = new Schema<IPatient>(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
 );
+
+patientSchema.virtual("firstName").get(function () {
+  if (!this.fullName) return "";
+  return this.fullName.split(" ")[0] || "";
+});
+
+patientSchema.virtual("lastName").get(function () {
+  if (!this.fullName) return "";
+  const parts = this.fullName.split(" ");
+  return parts.slice(1).join(" ") || "";
+});
 
 patientSchema.index({ phone: 1, clinicId: 1 });
 patientSchema.index({ fullName: 1, phone: 1 });

@@ -264,6 +264,50 @@ export class BillingService {
     return refund;
   }
 
+  static async listInvoices(options: {
+    page?: number;
+    limit?: number;
+    patientId?: string;
+    clinicId?: string;
+    status?: string;
+  }) {
+    const page = Math.max(1, Number(options.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(options.limit) || 20));
+    const skip = (page - 1) * limit;
+
+    const filter: Record<string, unknown> = {};
+    if (options.patientId && Types.ObjectId.isValid(options.patientId)) {
+      filter.patientId = new Types.ObjectId(options.patientId);
+    }
+    if (options.clinicId && Types.ObjectId.isValid(options.clinicId)) {
+      filter.clinicId = new Types.ObjectId(options.clinicId);
+    }
+    if (options.status) {
+      filter.status = options.status;
+    }
+
+    const [items, total] = await Promise.all([
+      Invoice.find(filter)
+        .populate("patientId", "fullName patientId phone")
+        .populate("clinicId", "name clinicCode branchCode")
+        .populate("orderId", "orderId orderBarcode status")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Invoice.countDocuments(filter),
+    ]);
+
+    return {
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    };
+  }
+
   static async getInvoiceById(id: string): Promise<IInvoice> {
     if (!Types.ObjectId.isValid(id)) {
       throw AppError.badRequest("Invalid invoice ID.");

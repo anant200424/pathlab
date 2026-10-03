@@ -11,6 +11,13 @@ const router = Router();
 
 router.use(authenticate);
 
+// List reports
+router.get(
+  "/",
+  requireAnyPermission(PERMISSIONS.REPORTS_DOWNLOAD, PERMISSIONS.REPORTS_PRINT, PERMISSIONS.REPORTS_PUBLISH),
+  ReportController.listReports,
+);
+
 // Generate report (publish)
 router.post(
   "/:orderId/generate",

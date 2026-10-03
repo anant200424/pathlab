@@ -136,7 +136,6 @@ const testDefinitionSchema = new Schema<ITestDefinition>(
 );
 
 testDefinitionSchema.index({ department: 1, isActive: 1 });
-testDefinitionSchema.index({ testCode: 1 });
 
 export const TestDefinition = mongoose.model<ITestDefinition>(
   "TestDefinition",

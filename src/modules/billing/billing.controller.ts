@@ -118,4 +118,33 @@ export class BillingController {
       next(error);
     }
   }
+
+  static async listInvoices(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const page = Number(req.query["page"]) || 1;
+      const limit = Number(req.query["limit"]) || 20;
+      const patientId = req.query["patientId"] as string;
+      const clinicId = req.query["clinicId"] as string;
+      const status = req.query["status"] as string;
+
+      const result = await BillingService.listInvoices({
+        page,
+        limit,
+        patientId,
+        clinicId,
+        status,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

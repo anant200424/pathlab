@@ -16,27 +16,31 @@ export interface PatientRegistrationResult {
 export class PatientService {
   static async registerPatient(
     data: {
-      fullName: string;
+      fullName?: string;
+      firstName?: string;
+      lastName?: string;
       dateOfBirth?: string;
       ageYears?: number;
       ageMonths?: number;
       gender: "male" | "female" | "other";
       phone: string;
       email?: string;
+      bloodGroup?: string;
       address?: {
-        line1: string;
+        line1?: string;
+        street?: string;
         line2?: string;
-        city: string;
-        state: string;
+        city?: string;
+        state?: string;
         postalCode?: string;
-        country: string;
+        country?: string;
       };
       emergencyContact?: {
         name: string;
         relationship: string;
         phone: string;
       };
-      clinicId: string;
+      clinicId?: string;
       defaultReferringDoctorId?: string;
       createInitialVisit?: boolean;
       visitType?: "outpatient" | "inpatient" | "home_collection" | "referral";
@@ -44,13 +48,15 @@ export class PatientService {
     },
     actorId?: string,
   ): Promise<PatientRegistrationResult> {
-    if (!Types.ObjectId.isValid(data.clinicId)) {
-      throw AppError.badRequest("Invalid clinic ID.");
+    let clinic = null;
+    if (data.clinicId && Types.ObjectId.isValid(data.clinicId)) {
+      clinic = await Clinic.findById(data.clinicId);
     }
-
-    const clinic = await Clinic.findById(data.clinicId);
     if (!clinic || !clinic.isActive) {
-      throw AppError.badRequest("Clinic not found or inactive.");
+      clinic = await Clinic.findOne({ isActive: true });
+    }
+    if (!clinic || !clinic.isActive) {
+      throw AppError.badRequest("No active clinic found. Please create or activate a clinic first.");
     }
 
     if (data.defaultReferringDoctorId) {
@@ -62,6 +68,11 @@ export class PatientService {
         throw AppError.badRequest("Doctor not found or inactive.");
       }
     }
+
+    const fullName =
+      data.fullName?.trim() ||
+      `${data.firstName || ""} ${data.lastName || ""}`.trim() ||
+      "Unknown Patient";
 
     // Check for duplicate warning (same phone in this clinic)
     let warning: string | undefined;
@@ -77,22 +88,27 @@ export class PatientService {
     const patientId = generateCustomId("PAT", 4);
     const registrationNumber = generateCustomId("REG", 4);
 
+    const address = {
+      line1: data.address?.line1 || data.address?.street || "",
+      line2: data.address?.line2,
+      city: data.address?.city || "",
+      state: data.address?.state || "",
+      postalCode: data.address?.postalCode,
+      country: data.address?.country || "India",
+    };
+
     const patient = await Patient.create({
       patientId,
       registrationNumber,
-      fullName: data.fullName,
+      fullName,
       dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
       ageYears: data.ageYears,
       ageMonths: data.ageMonths,
       gender: data.gender,
       phone: data.phone,
       email: data.email || undefined,
-      address: data.address || {
-        line1: "",
-        city: "",
-        state: "",
-        country: "India",
-      },
+      bloodGroup: data.bloodGroup || undefined,
+      address,
       emergencyContact: data.emergencyContact,
       clinicId: clinic._id,
       defaultReferringDoctorId: data.defaultReferringDoctorId

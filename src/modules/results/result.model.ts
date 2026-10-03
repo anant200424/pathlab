@@ -140,7 +140,6 @@ const testResultSchema = new Schema<ITestResult>(
 );
 
 testResultSchema.index({ orderId: 1, testId: 1 }, { unique: true });
-testResultSchema.index({ status: 1 });
 
 export const TestResult = mongoose.model<ITestResult>(
   "TestResult",

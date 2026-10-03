@@ -98,7 +98,6 @@ const clinicSchema = new Schema<IClinic>(
   },
 );
 
-clinicSchema.index({ clinicCode: 1 });
 clinicSchema.index({ isActive: 1 });
 
 export const Clinic = mongoose.model<IClinic>("Clinic", clinicSchema);

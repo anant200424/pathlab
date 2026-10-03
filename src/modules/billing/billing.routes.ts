@@ -24,6 +24,12 @@ router.post(
 );
 
 router.get(
+  "/invoices",
+  requirePermissions(PERMISSIONS.BILLING_READ),
+  BillingController.listInvoices,
+);
+
+router.get(
   "/invoices/:id",
   requirePermissions(PERMISSIONS.BILLING_READ),
   BillingController.getInvoiceById,

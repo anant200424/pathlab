@@ -4,6 +4,16 @@ import { z } from "zod";
 // Load .env file
 dotenv.config();
 
+const booleanPreprocess = z.preprocess((val) => {
+  if (typeof val === "boolean") return val;
+  if (typeof val === "string") {
+    const s = val.trim().toLowerCase();
+    if (s === "true" || s === "1" || s === "yes") return true;
+    if (s === "false" || s === "0" || s === "no" || s === "") return false;
+  }
+  return Boolean(val);
+}, z.boolean());
+
 const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -27,7 +37,7 @@ const envSchema = z.object({
     .min(16, "SESSION_SECRET must be at least 16 characters"),
   SESSION_TTL_HOURS: z.coerce.number().default(24),
   COOKIE_NAME: z.string().default("labcare_session"),
-  COOKIE_SECURE: z.coerce.boolean().default(false),
+  COOKIE_SECURE: booleanPreprocess.default(false),
   COOKIE_SAME_SITE: z.enum(["lax", "strict", "none"]).default("lax"),
   COOKIE_DOMAIN: z.string().optional(),
 
@@ -52,18 +62,18 @@ const envSchema = z.object({
     .default("info"),
 
   // Integrations (optional / stubs)
-  EMAIL_PROVIDER_ENABLED: z.coerce.boolean().default(false),
+  EMAIL_PROVIDER_ENABLED: booleanPreprocess.default(false),
   EMAIL_SMTP_HOST: z.string().optional(),
   EMAIL_SMTP_PORT: z.coerce.number().optional(),
   EMAIL_SMTP_USER: z.string().optional(),
   EMAIL_SMTP_PASS: z.string().optional(),
   EMAIL_FROM_ADDRESS: z.string().default("noreply@labcarepro.internal"),
 
-  SMS_PROVIDER_ENABLED: z.coerce.boolean().default(false),
+  SMS_PROVIDER_ENABLED: booleanPreprocess.default(false),
   SMS_PROVIDER_API_KEY: z.string().optional(),
   SMS_PROVIDER_SENDER_ID: z.string().optional(),
 
-  PAYMENT_GATEWAY_ENABLED: z.coerce.boolean().default(false),
+  PAYMENT_GATEWAY_ENABLED: booleanPreprocess.default(false),
   PAYMENT_GATEWAY_KEY_ID: z.string().optional(),
   PAYMENT_GATEWAY_KEY_SECRET: z.string().optional(),
   PAYMENT_GATEWAY_WEBHOOK_SECRET: z.string().optional(),

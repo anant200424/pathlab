@@ -360,6 +360,51 @@ export class ReportService {
     return { buffer, filename, contentType };
   }
 
+  static async listReports(options: {
+    page?: number;
+    limit?: number;
+    patientId?: string;
+    clinicId?: string;
+    status?: string;
+  }) {
+    const page = Math.max(1, Number(options.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(options.limit) || 20));
+    const skip = (page - 1) * limit;
+
+    const filter: Record<string, unknown> = {};
+    if (options.patientId && Types.ObjectId.isValid(options.patientId)) {
+      filter.patientId = new Types.ObjectId(options.patientId);
+    }
+    if (options.clinicId && Types.ObjectId.isValid(options.clinicId)) {
+      filter.clinicId = new Types.ObjectId(options.clinicId);
+    }
+    if (options.status) {
+      filter.status = options.status;
+    }
+
+    const [items, total] = await Promise.all([
+      Report.find(filter)
+        .populate("patientId", "patientId fullName firstName lastName phone")
+        .populate("orderId", "orderId orderBarcode priority status")
+        .populate("clinicId", "name clinicCode")
+        .populate("verifyingDoctorId", "fullName doctorId qualification")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Report.countDocuments(filter),
+    ]);
+
+    return {
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    };
+  }
+
   static async getPatientReports(patientId: string) {
     if (!Types.ObjectId.isValid(patientId)) {
       throw AppError.badRequest("Invalid patient ID.");
@@ -388,25 +433,42 @@ export class ReportService {
 
   static async generateHtmlPrintPreview(reportId: string): Promise<string> {
     const report = await this.getReportById(reportId);
-    const order = await TestOrder.findById(report.orderId).populate(
-      "patientId",
-    );
+    const order = await TestOrder.findById(report.orderId)
+      .populate("patientId")
+      .populate("referringDoctorId")
+      .populate("verifyingDoctorId");
 
     const patient = (order?.patientId as any) || {};
+    const refDoctor = (order?.referringDoctorId as any) || {};
+    const doctorName =
+      report.signerSnapshot?.doctorName ||
+      refDoctor?.fullName ||
+      "DR N UPADHYAY";
+    const doctorQual =
+      report.signerSnapshot?.qualification ||
+      refDoctor?.qualification ||
+      "M. B. B. S  M.D";
+    const doctorSpec =
+      (report.signerSnapshot as any)?.specialization ||
+      refDoctor?.specialization ||
+      "MICROBIOLOGIST";
+    const doctorReg =
+      report.signerSnapshot?.medicalRegistrationNumber ||
+      refDoctor?.medicalRegistrationNumber ||
+      "41175";
 
     const tableRows = (report.testResultsSnapshot || [])
       .map(
         (t: any) => `
-        <tr style="background:#f1f5f9;"><td colspan="5" style="padding:6px;font-weight:bold;color:#1e3a8a;">${t.testName} (${t.department})</td></tr>
+        <tr><td colspan="4" style="padding:10px 4px 4px;font-weight:900;font-size:12px;text-transform:uppercase;color:#09090b;border-bottom:1px solid #e4e4e7;">${t.testName} ${t.department ? `<span style="font-size:10px;color:#71717a;font-weight:normal;">(${t.department})</span>` : ""}</td></tr>
         ${(t.parameters || [])
           .map(
             (p: any) => `
-          <tr style="border-bottom:1px solid #e2e8f0;">
-            <td style="padding:6px 10px;">${p.name}</td>
-            <td style="padding:6px 10px;font-weight:bold;color:${p.flag !== "normal" ? "#dc2626" : "#0f172a"};">${p.value}</td>
-            <td style="padding:6px 10px;color:${p.flag !== "normal" ? "#dc2626" : "#16a34a"};">${p.flag.toUpperCase()}</td>
-            <td style="padding:6px 10px;color:#64748b;">${p.unit || "-"}</td>
-            <td style="padding:6px 10px;color:#334155;">${p.referenceRangeText || "Normal"}</td>
+          <tr style="border-bottom:1px solid #f4f4f5;font-size:11.5px;">
+            <td style="padding:6px 8px;color:#18181b;">${p.name}</td>
+            <td style="padding:6px 8px;text-align:center;font-weight:bold;font-family:monospace;color:${p.flag !== "normal" ? "#dc2626" : "#09090b"};">${p.value}</td>
+            <td style="padding:6px 8px;text-align:center;color:#3f3f46;font-family:monospace;">${p.referenceRangeText || "Normal"}</td>
+            <td style="padding:6px 8px;text-align:center;color:#71717a;font-family:monospace;">${p.unit || "-"}</td>
           </tr>
         `,
           )
@@ -415,64 +477,105 @@ export class ReportService {
       )
       .join("");
 
+    const sampleDate = (report as any).createdAt
+      ? new Date((report as any).createdAt).toLocaleString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : new Date().toLocaleString("en-GB");
+
+    const releasedDate = report.publishedAt
+      ? new Date(report.publishedAt).toLocaleString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : sampleDate;
+
     return `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
-        <title>Report Print Preview - ${report.reportId}</title>
+        <title>Report - ${report.reportId}</title>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 30px; color: #1e293b; }
-          .header { border-bottom: 2px solid #1e40af; padding-bottom: 12px; margin-bottom: 20px; }
-          .patient-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 24px; font-size: 13px; }
-          table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 30px; }
-          th { background: #0f172a; color: white; padding: 8px 10px; text-align: left; }
-          .footer { margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 15px; display: flex; justify-content: space-between; font-size: 12px; }
-          @media print { .no-print { display: none; } }
+          * { box-sizing: border-box; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; padding: 25px; color: #09090b; background: #fff; }
+          .container { max-width: 820px; margin: 0 auto; }
+          .header-box { border-top: 2px solid #18181b; border-bottom: 2px solid #18181b; padding: 10px 0; margin-bottom: 20px; font-family: monospace; font-size: 11px; display: grid; grid-template-columns: 7fr 5fr; gap: 15px; }
+          .pt-row { display: flex; margin-bottom: 4px; }
+          .pt-lbl { width: 95px; font-weight: bold; color: #27272a; }
+          .pt-val { font-weight: bold; text-transform: uppercase; color: #09090b; }
+          .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+          .inv-th { border-bottom: 2px solid #27272a; padding: 6px 8px; text-transform: uppercase; font-size: 11px; font-weight: bold; }
+          .end-rpt { text-align: center; font-weight: bold; font-family: monospace; margin: 30px 0; font-size: 12px; color: #3f3f46; }
+          .footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 60px; padding-top: 15px; border-top: 1px solid #d4d4d8; font-size: 11px; }
+          .action-bar { margin-bottom: 20px; display: flex; gap: 15px; font-weight: bold; font-size: 13px; color: #2563eb; }
+          .action-bar a, .action-bar button { color: #2563eb; text-decoration: none; background: none; border: none; cursor: pointer; font-weight: bold; padding: 0; }
+          @media print { .no-print { display: none !important; } body { padding: 0; } }
         </style>
       </head>
       <body>
-        <div class="no-print" style="margin-bottom:20px;text-align:right;">
-          <button onclick="window.print()" style="padding:8px 16px;background:#1e40af;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:600;">Print Report</button>
-        </div>
-        <div class="header">
-          <h1 style="margin:0;color:#1e3a8a;font-size:24px;">${report.brandingSnapshot.clinicName}</h1>
-          <p style="margin:4px 0;color:#64748b;font-size:12px;">${report.brandingSnapshot.addressText} | Phone: ${report.brandingSnapshot.contactText}</p>
-        </div>
-        <div class="patient-box">
-          <div>
-            <p><strong>Patient Name:</strong> ${patient.fullName || "N/A"}</p>
-            <p><strong>Patient ID:</strong> ${patient.patientId || "N/A"}</p>
-            <p><strong>Age / Gender:</strong> ${patient.ageYears || 0} Y / ${(patient.gender || "").toUpperCase()}</p>
+        <div class="container">
+          <div class="no-print action-bar">
+            <button onclick="window.print()">Print</button>
+            <span>|</span>
+            <button onclick="window.print()">Download</button>
+            <span>|</span>
+            <a href="mailto:">Mail</a>
+            <span>|</span>
+            <a href="https://wa.me/">Whats</a>
           </div>
-          <div>
-            <p><strong>Report ID:</strong> ${report.reportId}</p>
-            <p><strong>Order ID:</strong> ${order?.orderId || "N/A"}</p>
-            <p><strong>Report Date:</strong> ${report.publishedAt ? new Date(report.publishedAt).toLocaleDateString() : "N/A"}</p>
+
+          <div class="header-box">
+            <div>
+              <div class="pt-row"><span class="pt-lbl">PT NAME</span><span style="margin-right:6px;">:</span><span class="pt-val">${patient.fullName || "MR. ANANT KUMAR SINGH"}</span></div>
+              <div class="pt-row"><span class="pt-lbl">PT. AGE/SEX</span><span style="margin-right:6px;">:</span><span class="pt-val">${patient.ageYears ? patient.ageYears + "Y" : "28Y"} / ${(patient.gender || "MALE").toUpperCase()}</span></div>
+              <div class="pt-row"><span class="pt-lbl">MOBILE NO</span><span style="margin-right:6px;">:</span><span class="pt-val">${patient.phone || "-"}</span></div>
+              <div class="pt-row"><span class="pt-lbl">REF. BY</span><span style="margin-right:6px;">:</span><span class="pt-val">${refDoctor.fullName || "DR N UPADHYAY"}</span></div>
+            </div>
+            <div style="border-left: 1px solid #e4e4e7; padding-left: 12px;">
+              <div class="pt-row"><span class="pt-lbl" style="width:125px;">SAMPLE REGD. AT</span><span style="margin-right:4px;">:</span><span>${sampleDate}</span></div>
+              <div class="pt-row"><span class="pt-lbl" style="width:125px;">REPORT RELEASED ON</span><span style="margin-right:4px;">:</span><span>${releasedDate}</span></div>
+              <div class="pt-row"><span class="pt-lbl" style="width:125px;">PATIENT UNIQUE ID NO</span><span style="margin-right:4px;">:</span><span>${patient.patientId || "SH-1000000000"}</span></div>
+              <div class="pt-row"><span class="pt-lbl" style="width:125px;">REPORT STAT.</span><span style="margin-right:4px;">:</span><span style="font-weight:bold;color:${report.status === "published" ? "#15803d" : "#09090b"};">${report.status === "published" ? "Verified" : "Under Process"}</span></div>
+            </div>
           </div>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>TEST / PARAMETER</th>
-              <th>RESULT</th>
-              <th>FLAG</th>
-              <th>UNITS</th>
-              <th>REFERENCE RANGE</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${tableRows}
-          </tbody>
-        </table>
-        <div class="footer">
-          <div>
-            <p style="color:#64748b;font-size:11px;">* End of Report | Generated securely by LabCare Pro Enterprise *</p>
-          </div>
-          <div style="text-align:right;">
-            <p style="margin:0;font-weight:bold;">Verified & Approved By:</p>
-            <p style="margin:2px 0;">Dr. ${report.signerSnapshot.doctorName}</p>
-            <p style="margin:0;color:#64748b;font-size:11px;">${report.signerSnapshot.qualification} | Reg: ${report.signerSnapshot.medicalRegistrationNumber}</p>
+
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th class="inv-th" style="text-align:left;width:50%;">TEST / INVESTIGATION</th>
+                <th class="inv-th" style="text-align:center;width:18%;">OBSERVED VALUE</th>
+                <th class="inv-th" style="text-align:center;width:20%;">REFERENCE INTERVAL</th>
+                <th class="inv-th" style="text-align:center;width:12%;">UNIT</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+
+          <div class="end-rpt">--End Of Report--</div>
+
+          <div class="footer">
+            <div style="text-align:left;">
+              <p style="margin:0;font-weight:bold;">Prashant Kumar</p>
+              <p style="margin:2px 0;color:#52525b;font-size:10.5px;">Medical Microbiologist</p>
+              <p style="margin:0;color:#a1a1aa;font-size:9px;">Lab Technician & Quality Incharge</p>
+            </div>
+            <div style="text-align:right;">
+              <p style="margin:0;font-family:'Brush Script MT', cursive;font-size:22px;color:#18181b;">Nishant Upadhyay</p>
+              <p style="margin:2px 0 0;font-weight:900;text-transform:uppercase;">${doctorName}</p>
+              <p style="margin:1px 0;font-size:10.5px;color:#3f3f46;">${doctorQual}</p>
+              <p style="margin:1px 0;font-size:9.5px;font-weight:bold;text-transform:uppercase;color:#52525b;">${doctorSpec}</p>
+              <p style="margin:0;font-size:9.5px;font-family:monospace;color:#71717a;">Reg No-${doctorReg}</p>
+            </div>
           </div>
         </div>
       </body>

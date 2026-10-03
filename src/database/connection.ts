@@ -1,6 +1,14 @@
+import dns from "node:dns";
 import mongoose from "mongoose";
 import { env } from "../config/env.js";
 import { logger } from "../common/logging/logger.js";
+
+// Ensure DNS resolution handles MongoDB Atlas SRV records correctly on all networks
+try {
+  dns.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
+} catch (dnsErr) {
+  // If setServers fails in restricted environments, proceed with system DNS
+}
 
 let isConnected = false;
 

@@ -59,9 +59,6 @@ const testPackageSchema = new Schema<ITestPackage>(
   },
 );
 
-testPackageSchema.index({ packageCode: 1 });
-testPackageSchema.index({ isActive: 1 });
-
 export const TestPackage = mongoose.model<ITestPackage>(
   "TestPackage",
   testPackageSchema,
