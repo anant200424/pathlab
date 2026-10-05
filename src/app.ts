@@ -86,7 +86,18 @@ export function createApp(): Express {
     app.use(globalRateLimiter);
   }
 
-  // 6. OpenAPI Documentation
+  // 6. Root & OpenAPI Documentation
+  app.all("/", (_req: Request, res: Response) => {
+    res.status(200).json({
+      status: "UP",
+      name: "LabCare Pro Enterprise LIMS API",
+      version: "1.0.0",
+      health: "/health",
+      docs: "/api-docs",
+      api: env.API_PREFIX,
+    });
+  });
+
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   // 7. Health and Readiness Endpoints
