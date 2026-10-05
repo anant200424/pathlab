@@ -23,27 +23,27 @@ export function StatCard({ title, value, subtitle, icon: Icon, trend, color = 'i
   const colors = COLOR_MAP[color];
   return (
     <div className={cn(
-      'bg-white rounded-2xl border p-5 shadow-sm hover:shadow-md transition-shadow duration-200',
+      'bg-white rounded-xl sm:rounded-2xl border p-3.5 sm:p-5 shadow-sm hover:shadow-md transition-shadow duration-200 min-w-0',
       colors.border
     )}>
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-slate-500">{title}</p>
-          <p className="text-2xl font-bold text-slate-900 mt-1 tabular-nums">{value}</p>
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <p className="text-xs sm:text-sm font-medium text-slate-500 truncate">{title}</p>
+          <p className="text-lg sm:text-2xl font-bold text-slate-900 mt-1 tabular-nums truncate">{value}</p>
           {subtitle && (
-            <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 line-clamp-1">{subtitle}</p>
           )}
           {trend && (
             <p className={cn(
-              'text-xs font-medium mt-2',
+              'text-[10px] sm:text-xs font-medium mt-1 sm:mt-2 truncate',
               trend.positive ? 'text-emerald-600' : 'text-red-500'
             )}>
               {trend.positive ? '↑' : '↓'} {trend.value}
             </p>
           )}
         </div>
-        <div className={cn('p-2.5 rounded-xl flex-shrink-0', colors.icon)}>
-          <Icon size={20} />
+        <div className={cn('p-2 sm:p-2.5 rounded-lg sm:rounded-xl flex-shrink-0', colors.icon)}>
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Bell, Search, Check, CheckCheck } from 'lucide-react';
+import { Bell, Search, Check, CheckCheck, Menu } from 'lucide-react';
 import { useAuthStore } from '@/store/auth';
 import { useNotifications } from '@/hooks';
 import { notificationsService } from '@/lib/services/misc.service';
@@ -38,7 +38,11 @@ function getTitle(pathname: string): string {
   return 'LabCare Pro';
 }
 
-export default function Topbar() {
+interface TopbarProps {
+  onToggleSidebar?: () => void;
+}
+
+export default function Topbar({ onToggleSidebar }: TopbarProps) {
   const pathname = usePathname();
   const { user } = useAuthStore();
   const [showNotifications, setShowNotifications] = useState(false);
@@ -87,13 +91,25 @@ export default function Topbar() {
   };
 
   return (
-    <header className="fixed top-0 left-60 right-0 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-30">
-      {/* Left: Title */}
-      <div>
-        <h1 className="text-base font-semibold text-slate-900">{title}</h1>
-        <p className="text-xs text-slate-500">
-          {greeting()}, {user?.firstName} · {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-        </p>
+    <header className="fixed top-0 left-0 md:left-64 right-0 h-16 bg-white/95 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-3.5 sm:px-6 z-30 transition-all">
+      {/* Left: Mobile Menu Toggle + Title */}
+      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <button
+          type="button"
+          onClick={onToggleSidebar}
+          className="p-2 -ml-1 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 md:hidden flex-shrink-0 transition-colors"
+          aria-label="Open sidebar menu"
+          id="topbar-menu-toggle-btn"
+        >
+          <Menu size={20} />
+        </button>
+        <div className="min-w-0">
+          <h1 className="text-sm sm:text-base font-semibold text-slate-900 truncate">{title}</h1>
+          <p className="text-[11px] sm:text-xs text-slate-500 truncate">
+            {greeting()}, {user?.firstName}
+            <span className="hidden sm:inline"> · {new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+          </p>
+        </div>
       </div>
 
       {/* Right: Search + Notifications */}
@@ -126,7 +142,7 @@ export default function Topbar() {
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 top-12 w-96 bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden">
+            <div className="absolute right-0 top-12 w-[calc(100vw-2rem)] sm:w-96 max-w-sm bg-white rounded-xl shadow-xl border border-slate-200 z-50 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                 <h3 className="text-sm font-semibold text-slate-900">Notifications</h3>
                 <div className="flex items-center gap-2">

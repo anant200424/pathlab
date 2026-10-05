@@ -38,9 +38,33 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Quick Action Touch Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-indigo-600 via-indigo-700 to-teal-700 text-white rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm">
+        <div>
+          <h2 className="text-base sm:text-lg font-bold">Lab Command Center</h2>
+          <p className="text-xs sm:text-sm text-indigo-100">Live operational overview & patient queue</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/patients/new"
+            className="flex-1 sm:flex-initial px-3.5 py-2 bg-white text-indigo-700 hover:bg-indigo-50 font-semibold rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all shadow-sm flex items-center justify-center gap-1.5"
+          >
+            <Users size={14} />
+            <span>+ New Patient</span>
+          </Link>
+          <Link
+            href="/orders/new"
+            className="flex-1 sm:flex-initial px-3.5 py-2 bg-white/20 hover:bg-white/30 text-white font-medium rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all border border-white/20 flex items-center justify-center gap-1.5 backdrop-blur-sm"
+          >
+            <ClipboardList size={14} />
+            <span>+ New Order</span>
+          </Link>
+        </div>
+      </div>
+
       {/* KPI Grid row 1 */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {kpiQuery.isLoading ? (
           Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
         ) : (
@@ -60,9 +84,9 @@ export default function DashboardPage() {
               color="amber"
             />
             <StatCard
-              title="Awaiting Verification"
+              title="Verification"
               value={kpis?.pendingVerification ?? 0}
-              subtitle="Pathologist review needed"
+              subtitle="Review needed"
               icon={AlertTriangle}
               color="rose"
             />
@@ -78,7 +102,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Grid row 2 */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {kpiQuery.isLoading ? (
           Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
         ) : (
@@ -90,9 +114,9 @@ export default function DashboardPage() {
               icon={Users}
               color="blue"
             />
-            <StatCard title="Avg TAT" value="4.2h" subtitle="Average turnaround time" icon={Clock} color="violet" />
-            <StatCard title="Reports Published" value="—" subtitle="This month" icon={CheckCircle2} color="emerald" />
-            <StatCard title="Tests Performed" value="—" subtitle="This month" icon={Activity} color="indigo" />
+            <StatCard title="Avg TAT" value="4.2h" subtitle="Turnaround time" icon={Clock} color="violet" />
+            <StatCard title="Reports Done" value="—" subtitle="This month" icon={CheckCircle2} color="emerald" />
+            <StatCard title="Tests Run" value="—" subtitle="This month" icon={Activity} color="indigo" />
           </>
         )}
       </div>
@@ -189,26 +213,28 @@ export default function DashboardPage() {
                 <Link
                   key={order._id}
                   href={`/orders/${order._id}`}
-                  className="flex items-center justify-between px-5 py-3 hover:bg-slate-50 transition-colors"
+                  className="flex items-center justify-between px-3.5 sm:px-5 py-3 hover:bg-slate-50 transition-colors gap-2"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center flex-shrink-0">
                       <ClipboardList size={14} className="text-indigo-600" />
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-900">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-slate-900 truncate">
                         {patientFullName(order.patient)}
                         {order.patient?.patientId && (
-                          <span className="ml-2 text-xs text-slate-500">{order.patient.patientId}</span>
+                          <span className="ml-1 text-[10px] sm:text-xs text-slate-500 font-normal">({order.patient.patientId})</span>
                         )}
                       </p>
-                      <p className="text-xs text-slate-500">
-                        {order.orderId} · {order.orderedTests?.length ?? 0} test{(order.orderedTests?.length ?? 0) !== 1 ? 's' : ''} · {formatDateTime(order.createdAt)}
+                      <p className="text-[10px] sm:text-xs text-slate-500 truncate mt-0.5">
+                        {order.orderId} · {order.orderedTests?.length ?? 0} test{(order.orderedTests?.length ?? 0) !== 1 ? 's' : ''}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <PriorityBadge priority={order.priority} />
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                    <div className="hidden sm:block">
+                      <PriorityBadge priority={order.priority} />
+                    </div>
                     <OrderStatusBadge status={order.status} />
                   </div>
                 </Link>

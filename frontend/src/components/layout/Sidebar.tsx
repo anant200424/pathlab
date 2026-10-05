@@ -11,7 +11,7 @@ import {
   LayoutDashboard, Users, ClipboardList, FlaskConical,
   TestTube, FileText, CreditCard, Package, BarChart3,
   Building2, UserCog, Settings, Shield, ChevronRight,
-  LogOut, Stethoscope, Activity,
+  LogOut, Stethoscope, Activity, X,
 } from 'lucide-react';
 
 interface NavItem {
@@ -40,7 +40,12 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Settings',        href: '/settings',         icon: Settings,       permissions: ['settings:manage'] },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { user, clearUser } = useAuthStore();
   const permissions = user?.permissions ?? [];
@@ -64,19 +69,44 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-60 bg-white border-r border-slate-200 flex flex-col z-40 shadow-sm">
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-100">
-        <div className="flex items-center justify-center w-9 h-9 bg-indigo-600 rounded-xl shadow-sm shadow-indigo-200 flex-shrink-0">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
-          </svg>
+    <>
+      {/* Mobile Backdrop */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 md:hidden transition-opacity"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={cn(
+          'fixed left-0 top-0 h-full w-64 bg-white border-r border-slate-200 flex flex-col z-50 shadow-xl md:shadow-sm transition-transform duration-300 ease-in-out',
+          isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        )}
+      >
+        {/* Logo & Close on mobile */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-9 h-9 bg-indigo-600 rounded-xl shadow-sm shadow-indigo-200 flex-shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-900 leading-tight">LabCare Pro</p>
+              <p className="text-[10px] text-slate-500 leading-tight">Enterprise LIMS</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 md:hidden"
+            aria-label="Close menu"
+          >
+            <X size={18} />
+          </button>
         </div>
-        <div>
-          <p className="text-sm font-bold text-slate-900 leading-tight">LabCare Pro</p>
-          <p className="text-[10px] text-slate-500 leading-tight">Enterprise LIMS</p>
-        </div>
-      </div>
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto scrollbar-thin py-3 px-2">
@@ -92,6 +122,7 @@ export default function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => onClose?.()}
                 className={cn(
                   'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-100 group',
                   isActive
@@ -139,5 +170,6 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }
