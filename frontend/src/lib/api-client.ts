@@ -1,12 +1,14 @@
 import axios from 'axios';
 
 const getBaseUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.startsWith('http')) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
   if (typeof window !== 'undefined') {
-    // In browser: always use relative '/api/v1' to let Next.js proxy handle it seamlessly.
-    // This eliminates mixed-content HTTPS->HTTP blocks and localhost failures on mobile/remote devices.
+    // In browser: use relative '/api/v1' to let Next.js proxy handle it seamlessly.
     return '/api/v1';
   }
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+  return 'http://localhost:5000/api/v1';
 };
 
 export const apiClient = axios.create({

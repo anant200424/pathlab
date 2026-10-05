@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 
+const backendUrl =
+  process.env.BACKEND_URL ||
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  (process.env.NEXT_PUBLIC_API_URL
+    ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/v1\/?$/, "")
+    : "http://localhost:5000");
+
 const nextConfig: NextConfig = {
   // Allow Cloudflare tunnel and local origins
   allowedDevOrigins: [
@@ -11,15 +18,15 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:5000/api/:path*",
+        destination: `${backendUrl}/api/:path*`,
       },
       {
         source: "/health",
-        destination: "http://localhost:5000/health",
+        destination: `${backendUrl}/health`,
       },
       {
         source: "/api-docs/:path*",
-        destination: "http://localhost:5000/api-docs/:path*",
+        destination: `${backendUrl}/api-docs/:path*`,
       },
     ];
   },
