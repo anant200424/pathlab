@@ -51,15 +51,15 @@ export function LandingHero({
                   </div>
 
                   {/* Floating Pill Badge: PHD in pathology - University of New York */}
-                  <div className="absolute top-36 -left-3 sm:left-2 bg-white/90 backdrop-blur-md rounded-2xl p-2.5 shadow-xl border border-white/80 flex items-center gap-2.5 max-w-[240px]">
-                    <div className="w-8 h-8 rounded-xl bg-teal-500 text-white flex items-center justify-center flex-shrink-0">
-                      <Microscope size={17} />
+                  <div className="absolute top-28 sm:top-36 left-2 sm:left-2 bg-white/95 backdrop-blur-md rounded-2xl p-2 sm:p-2.5 shadow-xl border border-white/80 flex items-center gap-2 max-w-[210px] sm:max-w-[240px]">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-teal-500 text-white flex items-center justify-center flex-shrink-0">
+                      <Microscope size={15} />
                     </div>
                     <div>
-                      <p className="text-[11px] font-black text-slate-900 leading-tight">
+                      <p className="text-[10px] sm:text-[11px] font-black text-slate-900 leading-tight">
                         PHD in pathology
                       </p>
-                      <p className="text-[9px] font-medium text-slate-500 leading-tight">
+                      <p className="text-[8px] sm:text-[9px] font-medium text-slate-500 leading-tight">
                         University of New York
                       </p>
                     </div>
@@ -67,18 +67,18 @@ export function LandingHero({
                 </div>
 
                 {/* Bottom Details matching screenshot: Jessica Miller / Pathologist */}
-                <div className="pt-5 pb-3 text-center">
-                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                <div className="pt-4 sm:pt-5 pb-3 text-center">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                     Jessica Miller
                   </h3>
-                  <p className="text-sm font-bold text-teal-600 tracking-wide mt-0.5 font-sans">
+                  <p className="text-xs sm:text-sm font-bold text-teal-600 tracking-wide mt-0.5 font-sans">
                     Chief Pathologist & Lab Director
                   </p>
                   <div className="flex items-center justify-center gap-1 mt-2 text-amber-400">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} size={14} fill="currentColor" />
+                      <Star key={i} size={13} fill="currentColor" />
                     ))}
-                    <span className="text-xs font-bold text-slate-600 ml-1.5">
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-600 ml-1.5">
                       4.9 (1.2k+ reviews)
                     </span>
                   </div>
@@ -91,16 +91,16 @@ export function LandingHero({
           </div>
 
           {/* ─── Right Side: Hero Content matching Screenshot ─── */}
-          <div className="lg:col-span-7 space-y-7 order-1 lg:order-2 lg:pl-6">
-            <div className="space-y-4">
+          <div className="lg:col-span-7 space-y-6 sm:space-y-7 order-1 lg:order-2 lg:pl-6">
+            <div className="space-y-3.5 sm:space-y-4">
               {/* Trust Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-700 text-xs font-bold tracking-wide">
-                <Sparkles size={14} className="text-teal-600" />
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-teal-50 border border-teal-200/80 text-teal-700 text-[11px] sm:text-xs font-bold tracking-wide">
+                <Sparkles size={13} className="text-teal-600" />
                 <span>NABL Accredited & 100% Reliable Diagnostics</span>
               </div>
 
               {/* Main Headline matching Screenshot */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.18] sm:leading-[1.12]">
                 Providing Highest Standard of Clinical{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500">
                   Laboratory Service
@@ -108,18 +108,18 @@ export function LandingHero({
               </h1>
 
               {/* Subtitle matching Screenshot */}
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl font-normal">
+              <p className="text-sm sm:text-lg text-slate-600 leading-relaxed max-w-2xl font-normal">
                 We have world class pathologists & Lab assistants. We are equipped with best
                 laboratory machinery & reagents. We ensure best quality findings.
               </p>
             </div>
 
-            {/* Action Buttons matching Screenshot */}
-            <div className="flex flex-wrap items-center gap-4 pt-2">
+            {/* Action Buttons matching Screenshot - full width on mobile */}
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 pt-2">
               {/* Button 1: Cyan/Turquoise Pill matching screenshot */}
               <a
                 href="#services"
-                className="px-8 py-4 rounded-full bg-gradient-to-r from-teal-400 via-cyan-500 to-teal-500 hover:from-teal-500 hover:to-cyan-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-cyan-200/60 hover:shadow-cyan-300 transition-all transform hover:-translate-y-0.5 cursor-pointer text-center"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-teal-400 via-cyan-500 to-teal-500 hover:from-teal-500 hover:to-cyan-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-cyan-200/60 hover:shadow-cyan-300 transition-all text-center flex items-center justify-center"
               >
                 Get Patholab Services
               </a>
@@ -127,7 +127,7 @@ export function LandingHero({
               {/* Button 2: Deep Navy Blue Pill matching screenshot */}
               <button
                 onClick={onOpenAppointmentModal}
-                className="px-8 py-4 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-slate-900/20 hover:shadow-slate-900/30 transition-all transform hover:-translate-y-0.5 cursor-pointer text-center"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-slate-900/20 hover:shadow-slate-900/30 transition-all text-center flex items-center justify-center cursor-pointer"
               >
                 Book A Lab Visit
               </button>
@@ -135,7 +135,7 @@ export function LandingHero({
               {/* Button 3: Track Report Slip */}
               <button
                 onClick={onOpenReportTrackerModal}
-                className="px-6 py-4 rounded-full border-2 border-teal-500 text-teal-700 hover:bg-teal-50 font-bold text-sm transition-all cursor-pointer flex items-center gap-1.5"
+                className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-full border-2 border-teal-500 text-teal-700 hover:bg-teal-50 font-bold text-sm transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <span>Track Report Slip</span>
                 <ArrowRight size={15} />
@@ -143,31 +143,31 @@ export function LandingHero({
             </div>
 
             {/* Metrics Counters matching Screenshot (500+ / 2M+ / 100+) */}
-            <div className="pt-8 border-t border-slate-200/70 grid grid-cols-3 gap-6 sm:gap-10">
-              <div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-cyan-600 tracking-tight font-sans">
+            <div className="pt-6 sm:pt-8 border-t border-slate-200/70 grid grid-cols-3 gap-2 sm:gap-10">
+              <div className="text-center sm:text-left">
+                <div className="text-2xl sm:text-4xl lg:text-5xl font-black text-cyan-600 tracking-tight font-sans">
                   500+
                 </div>
-                <p className="text-xs sm:text-sm font-bold text-slate-700 mt-1">
-                  Patients Served Daily
+                <p className="text-[10px] sm:text-sm font-bold text-slate-700 mt-0.5 sm:mt-1">
+                  Daily Patients
                 </p>
               </div>
 
-              <div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-cyan-600 tracking-tight font-sans">
+              <div className="text-center sm:text-left">
+                <div className="text-2xl sm:text-4xl lg:text-5xl font-black text-cyan-600 tracking-tight font-sans">
                   2M+
                 </div>
-                <p className="text-xs sm:text-sm font-bold text-slate-700 mt-1">
-                  Reports Delivered
+                <p className="text-[10px] sm:text-sm font-bold text-slate-700 mt-0.5 sm:mt-1">
+                  Reports Done
                 </p>
               </div>
 
-              <div>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-cyan-600 tracking-tight font-sans">
+              <div className="text-center sm:text-left">
+                <div className="text-2xl sm:text-4xl lg:text-5xl font-black text-cyan-600 tracking-tight font-sans">
                   100+
                 </div>
-                <p className="text-xs sm:text-sm font-bold text-slate-700 mt-1">
-                  Expert Specialists
+                <p className="text-[10px] sm:text-sm font-bold text-slate-700 mt-0.5 sm:mt-1">
+                  Specialists
                 </p>
               </div>
             </div>

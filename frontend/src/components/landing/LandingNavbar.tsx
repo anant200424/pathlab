@@ -95,17 +95,25 @@ export function LandingNavbar({
             </button>
           </div>
 
-          {/* Mobile hamburger menu */}
-          <div className="flex sm:hidden items-center gap-2">
+          {/* Mobile actions (Book + Staff + Hamburger) */}
+          <div className="flex sm:hidden items-center gap-1.5">
+            <Link
+              href="/login"
+              className="p-2 text-slate-700 hover:text-teal-600 rounded-lg hover:bg-slate-100 transition-colors"
+              title="Staff Portal Login"
+            >
+              <UserCircle size={20} />
+            </Link>
             <button
               onClick={onOpenAppointmentModal}
-              className="px-3 py-1.5 rounded-full bg-teal-500 text-white text-xs font-bold"
+              className="px-3 py-1.5 rounded-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-xs font-bold shadow-xs active:scale-95 transition-transform"
             >
               Book
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-slate-600 hover:text-slate-900 rounded-lg focus:outline-none"
+              className="p-2 text-slate-700 hover:text-slate-900 rounded-lg focus:outline-none hover:bg-slate-100 transition-colors"
+              aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -114,60 +122,76 @@ export function LandingNavbar({
 
         {/* Mobile menu dropdown */}
         {mobileMenuOpen && (
-          <div className="sm:hidden border-t border-slate-100 py-4 px-2 space-y-3 bg-white animate-in slide-in-from-top-2">
+          <div className="sm:hidden border-t border-slate-100 py-4 px-3 space-y-2.5 bg-white/98 backdrop-blur-xl animate-in slide-in-from-top-2 rounded-b-2xl shadow-xl">
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 text-sm font-bold text-teal-600"
+              className="flex items-center justify-between px-3 py-2.5 text-sm font-bold text-teal-600 bg-teal-50/60 rounded-xl"
             >
-              Home
+              <span>Home</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-teal-100 text-teal-700">Live</span>
             </Link>
             <a
               href="#services"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-lg"
+              className="block px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors"
             >
-              Services
+              Our Services (6 Tests)
             </a>
             <a
               href="#packages"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-lg"
+              className="block px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors"
             >
-              Health Packages
+              Popular Health Packages
             </a>
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 onOpenReportTrackerModal();
               }}
-              className="w-full text-left px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-lg flex items-center gap-2"
+              className="w-full text-left px-3 py-2.5 text-sm font-semibold text-teal-800 bg-teal-50/50 hover:bg-teal-50 rounded-xl flex items-center justify-between transition-colors cursor-pointer"
             >
-              <FileText size={15} className="text-teal-600" />
-              <span>Track Report Slip</span>
+              <div className="flex items-center gap-2">
+                <FileText size={16} className="text-teal-600" />
+                <span>Track Report Slip (Original)</span>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-teal-600 bg-white px-2 py-0.5 rounded-full border border-teal-200">Instant</span>
             </button>
             <a
               href="#doctors"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-lg"
+              className="block px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl transition-colors"
             >
-              Our Pathologists
+              Dr. N Upadhyay & Pathologists
             </a>
+
+            {/* Direct Mobile Quick Call */}
             <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+              <a
+                href="tel:+919431200001"
+                className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-xs bg-slate-50"
+              >
+                <PhoneCall size={14} className="text-teal-600" />
+                <span>Call Lab: +91 94312 00001</span>
+              </a>
+
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenAppointmentModal();
                 }}
-                className="w-full py-2.5 rounded-full bg-teal-500 text-white font-bold text-sm text-center"
+                className="w-full py-3 rounded-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold text-sm text-center shadow-md shadow-cyan-200 active:scale-98 transition-transform"
               >
-                Make Appointment
+                Make Appointment (Free Home Collection)
               </button>
               <Link
                 href="/login"
-                className="w-full py-2.5 rounded-full border border-slate-200 text-slate-700 font-bold text-sm text-center"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-2.5 rounded-full border border-slate-300 text-slate-800 font-bold text-xs text-center hover:bg-slate-50 flex items-center justify-center gap-1.5"
               >
-                Staff Portal Login
+                <UserCircle size={15} />
+                <span>Lab Staff / Admin Portal Login</span>
               </Link>
             </div>
           </div>

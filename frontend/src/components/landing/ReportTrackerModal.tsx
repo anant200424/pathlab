@@ -46,16 +46,16 @@ export function ReportTrackerModal({ isOpen, onClose }: ReportTrackerModalProps)
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden text-slate-800">
-        <div className="bg-slate-900 px-6 py-5 text-white flex items-center justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 animate-in fade-in duration-200 overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[94vh] flex flex-col overflow-hidden text-slate-800 my-auto">
+        <div className="bg-slate-900 px-5 sm:px-6 py-4 sm:py-5 text-white flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center">
               <FileText size={18} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Track & Download Report Slip</h3>
-              <p className="text-[11px] text-slate-400">View original ePathLab clinical test slip</p>
+              <h3 className="text-sm sm:text-base font-bold text-white">Track & Download Report Slip</h3>
+              <p className="text-[10px] sm:text-[11px] text-slate-400">View original ePathLab clinical test slip</p>
             </div>
           </div>
           <button
@@ -66,8 +66,8 @@ export function ReportTrackerModal({ isOpen, onClose }: ReportTrackerModalProps)
           </button>
         </div>
 
-        <div className="p-6 space-y-4">
-          <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto max-h-[calc(94vh-80px)]">
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input

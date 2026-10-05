@@ -1,12 +1,19 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'] });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#0d9488',
+};
+
 export const metadata: Metadata = {
-  title: 'LabCare Pro — Enterprise LIMS',
+  title: 'patholab LABORATORY — Clinical Diagnostic Services',
   description: 'Multi-branch Laboratory Information & Management System for pathology labs and diagnostic centres',
   keywords: 'LIMS, laboratory, pathology, diagnostic centre, patient management',
 };

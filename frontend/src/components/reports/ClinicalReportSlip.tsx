@@ -102,54 +102,54 @@ export function ClinicalReportSlip({
   const barcodeValue = data.orderBarcode || data.orderId.replace(/[^0-9]/g, '').slice(-8) || '10137283';
 
   return (
-    <div className="min-h-screen bg-slate-100 py-4 px-2 sm:px-4 print:bg-white print:p-0 print:m-0">
+    <div className="min-h-screen bg-slate-100 py-3 sm:py-4 px-1.5 sm:px-4 print:bg-white print:p-0 print:m-0">
       {/* ─── Top Action Bar (Screenshot 4: Print | Download | Mail | Whats) ─── */}
-      <div className="max-w-[850px] mx-auto mb-4 bg-white rounded-lg shadow-sm border border-slate-200 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 no-print">
-        <div className="flex items-center gap-4 text-sm font-semibold text-blue-700">
+      <div className="max-w-[850px] mx-auto mb-3 sm:mb-4 bg-white rounded-xl shadow-xs border border-slate-200 px-3 sm:px-4 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-2.5 no-print">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-xs sm:text-sm font-semibold text-blue-700">
           {showBackLink && (
             <Link
               href={backHref}
-              className="flex items-center gap-1 text-slate-500 hover:text-slate-800 transition-colors mr-2 pr-3 border-r border-slate-200"
+              className="flex items-center gap-1 text-slate-500 hover:text-slate-800 transition-colors pr-2 sm:pr-3 border-r border-slate-200"
             >
-              <ArrowLeft size={15} /> Back
+              <ArrowLeft size={14} /> Back
             </Link>
           )}
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 hover:text-blue-900 transition-colors cursor-pointer"
+            className="flex items-center gap-1 hover:text-blue-900 transition-colors cursor-pointer py-1 px-1.5 rounded"
             id="report-print-btn"
           >
-            <Printer size={15} />
-            Print
+            <Printer size={14} />
+            <span>Print</span>
           </button>
           <span className="text-slate-300">|</span>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 hover:text-blue-900 transition-colors cursor-pointer"
+            className="flex items-center gap-1 hover:text-blue-900 transition-colors cursor-pointer py-1 px-1.5 rounded"
             id="report-download-btn"
           >
-            <Download size={15} />
-            Download
+            <Download size={14} />
+            <span>Download</span>
           </button>
           <span className="text-slate-300">|</span>
           <button
             onClick={handleMail}
-            className="flex items-center gap-1.5 hover:text-blue-900 transition-colors cursor-pointer"
+            className="flex items-center gap-1 hover:text-blue-900 transition-colors cursor-pointer py-1 px-1.5 rounded"
           >
-            <Mail size={15} />
-            Mail
+            <Mail size={14} />
+            <span>Mail</span>
           </button>
           <span className="text-slate-300">|</span>
           <button
             onClick={handleWhatsApp}
-            className="flex items-center gap-1.5 hover:text-emerald-700 text-emerald-600 transition-colors cursor-pointer"
+            className="flex items-center gap-1 hover:text-emerald-700 text-emerald-600 transition-colors cursor-pointer py-1 px-1.5 rounded"
           >
-            <MessageSquare size={15} />
-            Whats
+            <MessageSquare size={14} />
+            <span>Whats</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex items-center gap-2 text-xs ml-auto sm:ml-0">
           <label className="font-semibold text-slate-600">Format :</label>
           <select
             value={currentFormat}
@@ -164,13 +164,14 @@ export function ClinicalReportSlip({
         </div>
       </div>
 
-      {/* ─── Clinical Report Slip Canvas (Screenshots 4 & 5) ─── */}
-      <div
-        ref={printAreaRef}
-        id="clinical-report-slip"
-        className="max-w-[850px] mx-auto bg-white shadow-xl rounded-sm p-6 sm:p-10 border border-slate-300 print:border-none print:shadow-none print:p-6 print:max-w-none text-slate-900 print:text-black font-sans leading-relaxed"
-        style={{ minHeight: '1050px' }}
-      >
+      {/* ─── Mobile Horizontal Scroll Wrapper for Authentic Clinical Alignment ─── */}
+      <div className="w-full overflow-x-auto pb-4">
+        <div
+          ref={printAreaRef}
+          id="clinical-report-slip"
+          className="min-w-[680px] sm:min-w-0 max-w-[850px] mx-auto bg-white shadow-xl rounded-sm p-6 sm:p-10 border border-slate-300 print:border-none print:shadow-none print:p-6 print:max-w-none print:min-w-0 text-slate-900 print:text-black font-sans leading-relaxed"
+          style={{ minHeight: '1050px' }}
+        >
         {/* Optional Letterhead space (if MAIN show header, if HEADERLESS leave blank margin for pre-printed letterhead) */}
         {currentFormat === 'MAIN' ? (
           <div className="mb-4 pb-3 border-b-2 border-slate-800 flex items-start justify-between">
@@ -403,5 +404,6 @@ export function ClinicalReportSlip({
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }

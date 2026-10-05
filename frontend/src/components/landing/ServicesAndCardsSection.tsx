@@ -132,7 +132,7 @@ export function ServicesAndCardsSection({ onOpenAppointmentModal }: ServicesAndC
   ];
 
   return (
-    <div className="space-y-24 py-16 bg-white" id="services">
+    <div className="space-y-12 sm:space-y-20 py-10 sm:py-16 bg-white" id="services">
       {/* ─── 1. "Our amazing Services" Section matching user screenshot ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto space-y-3">
@@ -199,7 +199,7 @@ export function ServicesAndCardsSection({ onOpenAppointmentModal }: ServicesAndC
 
       {/* ─── 2. Impactful Fully Working Card 1: Track & Download Report Slip ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-[36px] bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 text-white p-8 sm:p-12 overflow-hidden shadow-2xl">
+        <div className="relative rounded-3xl sm:rounded-[36px] bg-gradient-to-br from-slate-900 via-slate-800 to-teal-950 text-white p-5 sm:p-12 overflow-hidden shadow-2xl">
           <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">

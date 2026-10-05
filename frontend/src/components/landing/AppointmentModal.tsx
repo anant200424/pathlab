@@ -54,8 +54,8 @@ export function AppointmentModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden text-slate-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-4 animate-in fade-in duration-200 overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[94vh] flex flex-col overflow-hidden text-slate-800 my-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-teal-500 via-cyan-500 to-teal-600 px-6 py-5 text-white flex items-center justify-between">
           <div>
@@ -92,7 +92,7 @@ export function AppointmentModal({
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-3.5 sm:space-y-4 overflow-y-auto max-h-[calc(94vh-80px)]">
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
