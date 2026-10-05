@@ -1,14 +1,27 @@
 import axios from 'axios';
 
+const LIVE_RENDER_API = 'https://pathlab-api.onrender.com/api/v1';
+
 const getBaseUrl = (): string => {
-  if (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.startsWith('http')) {
+  // If explicitly configured with a custom non-localhost URL
+  if (
+    process.env.NEXT_PUBLIC_API_URL &&
+    process.env.NEXT_PUBLIC_API_URL.startsWith('http') &&
+    !process.env.NEXT_PUBLIC_API_URL.includes('localhost')
+  ) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
+
+  // If in browser (client-side):
   if (typeof window !== 'undefined') {
-    // In browser: use relative '/api/v1' to let Next.js proxy handle it seamlessly.
-    return '/api/v1';
+    // When opened from mobile phones, Cloudflare tunnels, or Vercel, always point to live Render backend
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return LIVE_RENDER_API;
+    }
+    return process.env.NEXT_PUBLIC_API_URL || '/api/v1';
   }
-  return 'http://localhost:5000/api/v1';
+
+  return LIVE_RENDER_API;
 };
 
 export const apiClient = axios.create({

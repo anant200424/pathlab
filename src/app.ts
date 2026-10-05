@@ -57,6 +57,8 @@ export function createApp(): Express {
           origin.endsWith(".vercel.app") ||
           origin.includes("vercel.app") ||
           origin.includes("localhost") ||
+          origin.includes("trycloudflare.com") ||
+          origin.includes("onrender.com") ||
           env.NODE_ENV === "development"
         ) {
           callback(null, true);
