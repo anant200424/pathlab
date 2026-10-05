@@ -148,6 +148,8 @@ export function createApp(): Express {
   apiRouter.use("/audit", auditRoutes);
 
   app.use(env.API_PREFIX, apiRouter);
+  app.use("/api", apiRouter);
+  app.use(apiRouter);
 
   // 9. 404 Route Not Found Handler
   app.use((req: Request, _res: Response, next: NextFunction) => {

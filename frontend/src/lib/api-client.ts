@@ -2,6 +2,12 @@ import axios from 'axios';
 
 const LIVE_RENDER_API = 'https://pathlab-api.onrender.com/api/v1';
 
+const normalizeApiUrl = (url?: string): string => {
+  if (!url) return LIVE_RENDER_API;
+  const clean = url.replace(/\/+$/, '');
+  return clean.endsWith('/api/v1') ? clean : `${clean}/api/v1`;
+};
+
 const getBaseUrl = (): string => {
   // If explicitly configured with a custom non-localhost URL
   if (
@@ -9,7 +15,7 @@ const getBaseUrl = (): string => {
     process.env.NEXT_PUBLIC_API_URL.startsWith('http') &&
     !process.env.NEXT_PUBLIC_API_URL.includes('localhost')
   ) {
-    return process.env.NEXT_PUBLIC_API_URL;
+    return normalizeApiUrl(process.env.NEXT_PUBLIC_API_URL);
   }
 
   // If in browser (client-side):
@@ -18,7 +24,7 @@ const getBaseUrl = (): string => {
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
       return LIVE_RENDER_API;
     }
-    return process.env.NEXT_PUBLIC_API_URL || '/api/v1';
+    return process.env.NEXT_PUBLIC_API_URL ? normalizeApiUrl(process.env.NEXT_PUBLIC_API_URL) : '/api/v1';
   }
 
   return LIVE_RENDER_API;
