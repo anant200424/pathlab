@@ -27,6 +27,7 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -41,16 +42,22 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const user = await authService.login({
-        email: data.email,
-        password: data.password,
+        email: data.email.trim(),
+        password: data.password.trim(),
         rememberMe: data.rememberMe ?? false,
       });
       setUser(user);
       toast.success(`Welcome back, ${user.firstName}!`);
       router.push('/dashboard');
     } catch (err: unknown) {
+      const axiosErr = err as {
+        response?: { data?: { message?: string; error?: { message?: string } } };
+        message?: string;
+      };
       const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
+        axiosErr.response?.data?.message ||
+        axiosErr.response?.data?.error?.message ||
+        axiosErr.message ||
         'Invalid email or password';
       toast.error(msg);
     } finally {
@@ -150,11 +157,40 @@ export default function LoginPage() {
         </button>
       </form>
 
-      {/* Dev hint */}
-      <div className="mt-6 p-3 bg-slate-50 rounded-xl border border-slate-200">
-        <p className="text-xs font-medium text-slate-600 mb-1">Default credentials</p>
-        <p className="text-xs text-slate-500 font-mono">admin@labcarepro.internal</p>
-        <p className="text-xs text-slate-500 font-mono">Admin@LabCarePro2026!</p>
+      {/* Interactive 1-Tap Demo Login Widget */}
+      <div className="mt-6 p-4 bg-teal-50 border border-teal-200 rounded-xl">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-semibold text-teal-800 uppercase tracking-wider">Demo Admin Account</span>
+          <span className="text-[10px] bg-teal-200 text-teal-900 px-2 py-0.5 rounded-full font-bold">1-TAP FILL</span>
+        </div>
+        <div className="space-y-1 mb-3 text-xs font-mono text-teal-900">
+          <p><span className="text-teal-600 font-sans">Email:</span> admin@labcarepro.internal</p>
+          <p><span className="text-teal-600 font-sans">Password:</span> admin123 <span className="text-slate-400 font-sans">or</span> Admin@LabCarePro2026!</p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setValue('email', 'admin@labcarepro.internal');
+              setValue('password', 'admin123');
+              toast.success('Filled with admin123! Click Sign in.');
+            }}
+            className="w-full py-2 px-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-xs font-medium transition-colors shadow-sm text-center"
+          >
+            ⚡ Fill Simple (admin123)
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setValue('email', 'admin@labcarepro.internal');
+              setValue('password', 'Admin@LabCarePro2026!');
+              toast.success('Filled default credentials! Click Sign in.');
+            }}
+            className="w-full py-2 px-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg text-xs font-medium transition-colors shadow-sm text-center"
+          >
+            ⚡ Fill Default
+          </button>
+        </div>
       </div>
     </div>
   );
